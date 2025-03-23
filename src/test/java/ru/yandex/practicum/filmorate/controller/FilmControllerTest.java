@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 class FilmControllerTest {
-    private final static LocalDate FIRST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate FIRST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
     FilmController filmController;
     Film film1;
 
