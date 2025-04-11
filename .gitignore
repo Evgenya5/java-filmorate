@@ -27,6 +27,7 @@ target/
 .idea
 *.iws
 *.iml
+**/application.properties
 *.ipr
 
 ### NetBeans ###
