@@ -18,37 +18,35 @@ public class UserController {
         this.userService = userService;
     }
 
-
     @GetMapping
     public Collection<User> findAll() {
         return userService.findAll();
     }
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable("id") long id) {
+    public User findById(@PathVariable long id) {
         return userService.findById(id);
     }
 
     @GetMapping("/{id}/friends")
-    public Collection<User> getFriends(@PathVariable("id") long id) {
+    public Collection<User> getFriends(@PathVariable long id) {
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Collection<User> getCommonFriends(@PathVariable("id") long id, @PathVariable("otherId") long otherId) {
+    public Collection<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
         return userService.getCommonFriends(id, otherId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable("id") long id, @PathVariable("friendId") long friendId) {
+    public void addFriend(@PathVariable long id, @PathVariable long friendId) {
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable("id") long id, @PathVariable("friendId") long friendId) {
+    public void deleteFriend(@PathVariable long id, @PathVariable long friendId) {
         userService.deleteFriend(id, friendId);
     }
-
 
     @PostMapping
     public User create(@RequestBody User user) {

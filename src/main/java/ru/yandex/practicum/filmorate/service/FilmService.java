@@ -40,12 +40,10 @@ public class FilmService {
     }
 
     public void addLike(long filmId, long userId) {
-        log.error("add like filmID " + filmId);
         Film film = filmStorage.findById(filmId);
         if (film == null) {
             throw new NotFoundException("Фильм с id = " + filmId + " не найден");
         }
-        log.error("add like userID " + userId);
         User user = userService.findById(userId);
         if (user == null) {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
@@ -70,7 +68,7 @@ public class FilmService {
     public Collection<Film> findPopularFilms(int count) {
         Comparator<Film> getMaxLikes = (s1, s2) -> s2.getLikes().size() - s1.getLikes().size();
 
-        if (count <=0) {
+        if (count <= 0) {
             count = DEFAULT_COUNT;
         }
         return filmStorage.findAll().stream()
@@ -97,6 +95,7 @@ public class FilmService {
             log.error("update error: id is null");
             throw new ValidationException("Id должен быть указан");
         }
+
         if (filmStorage.findById(film.getId()) != null) {
             Film oldFilm = filmStorage.findById(film.getId());
             // если найдена и все условия соблюдены, обновляем её содержимое
