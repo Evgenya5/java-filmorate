@@ -121,7 +121,7 @@ public class UserService {
         if (user == null) {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
-        for (long friendId:user.getFriends()){
+        for (long friendId:user.getFriends()) {
             friends.add(userStorage.findById(friendId));
         }
         return friends;
@@ -139,7 +139,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
 
-        for (long friendId:user.getFriends()){
+        for (long friendId:user.getFriends()) {
             if (otherUser.getFriends().contains(friendId)) {
                 friends.add(userStorage.findById(friendId));
             }
