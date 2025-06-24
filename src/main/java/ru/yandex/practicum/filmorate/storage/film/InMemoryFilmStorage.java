@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -22,6 +24,10 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
+        Optional.ofNullable(film).orElseThrow(() ->
+                new NotFoundException("Фильм пустой"));
+        Optional.ofNullable(films.get(film.getId())).orElseThrow(() ->
+                new NotFoundException("Фильм с id " + film.getId() + " не найден"));
         return films.replace(film.getId(), film);
     }
 
@@ -32,6 +38,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film findById(long filmId) {
-        return films.get(filmId);
+        return Optional.ofNullable(films.get(filmId)).orElseThrow(() ->
+                new NotFoundException("Фильм с id = " + filmId + " не найден"));
     }
 }

@@ -11,9 +11,9 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    @Autowired
     private final FilmService filmService;
 
+    @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
@@ -29,7 +29,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> findPopularFilms(@RequestParam(required = false) int count) {
+    public Collection<Film> findPopularFilms(@RequestParam(required = false, defaultValue = "10") int count) {
         return filmService.findPopularFilms(count);
     }
 
