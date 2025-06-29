@@ -5,6 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,10 +18,14 @@ class FilmControllerTest {
     private static final LocalDate FIRST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
     FilmController filmController;
     Film film1;
+    UserStorage userStorage;
+    FilmService filmService;
 
     @BeforeEach
     void beforeEach() {
-        filmController = new FilmController();
+        userStorage = new InMemoryUserStorage();
+        filmService = new FilmService(userStorage, new InMemoryFilmStorage());
+        filmController = new FilmController(filmService);
         film1 = new Film();
         film1.setDuration(100);
         film1.setReleaseDate(FIRST_RELEASE_DATE.plusDays(100));
