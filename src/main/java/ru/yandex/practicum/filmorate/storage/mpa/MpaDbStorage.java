@@ -19,6 +19,7 @@ public class MpaDbStorage implements MpaStorage {
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     @Override
     public Collection<Mpa> findAll() {
         return jdbcTemplate.query("SELECT id, name FROM mpa", new MpaRowMapper());

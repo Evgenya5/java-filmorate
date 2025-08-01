@@ -19,6 +19,7 @@ public class GenreDbStorage implements GenreStorage {
     public GenreDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     @Override
     public Collection<Genre> findAll() {
         return jdbcTemplate.query("SELECT id, name FROM genre", new GenreRowMapper());
