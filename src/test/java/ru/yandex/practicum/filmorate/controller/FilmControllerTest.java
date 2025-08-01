@@ -7,9 +7,10 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.InMemoryGenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.InMemoryMPAStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ class FilmControllerTest {
     @BeforeEach
     void beforeEach() {
         userStorage = new InMemoryUserStorage();
-        filmService = new FilmService(userStorage, new InMemoryFilmStorage());
+        filmService = new FilmService(userStorage, new InMemoryFilmStorage(), new InMemoryGenreStorage(), new InMemoryMPAStorage());
         filmController = new FilmController(filmService);
         film1 = new Film();
         film1.setDuration(100);
@@ -126,7 +127,7 @@ class FilmControllerTest {
         updateFilm = filmController.update(film);
         Assertions.assertEquals(film.getDuration(), updateFilm.getDuration());
         Assertions.assertEquals(film1.getId(), updateFilm.getId());
-        film.setId(null);
+        film.setId(0);
         exc = Assertions.assertThrows(ValidationException.class, () -> {
             filmController.update(film);
         });

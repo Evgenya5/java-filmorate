@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
+@Qualifier("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -32,13 +34,24 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void delete(long filmId) {
+    public int delete(long filmId) {
         films.remove(filmId);
+        return 0;
     }
 
     @Override
     public Film findById(long filmId) {
         return Optional.ofNullable(films.get(filmId)).orElseThrow(() ->
                 new NotFoundException("Фильм с id = " + filmId + " не найден"));
+    }
+
+    @Override
+    public void addLike(Film film, long userId) {
+        film.addLike(userId);
+    }
+
+    @Override
+    public void deleteLike(Film film, long userId) {
+        film.deleteLike(userId);
     }
 }

@@ -10,15 +10,21 @@ import java.util.Set;
  */
 @Data
 public class Film {
-    private Long id;
+    private long id;
     private String description;
     private String name;
     private LocalDate releaseDate;
     private int duration;
+    private Mpa mpa;
     private Set<Long> likes = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
 
     public void addLike(long userId) {
         likes.add(userId);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
 
     public void deleteLike(long userId) {

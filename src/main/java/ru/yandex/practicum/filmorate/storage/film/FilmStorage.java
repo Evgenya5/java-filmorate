@@ -11,7 +11,11 @@ public interface FilmStorage {
 
     Collection<Film> findAll();
 
-    void delete(long filmId);
+    int delete(long filmId);
 
     Film findById(long filmId);
+
+    void addLike(Film film, long userId);
+
+    void deleteLike(Film film, long userId);
 }
