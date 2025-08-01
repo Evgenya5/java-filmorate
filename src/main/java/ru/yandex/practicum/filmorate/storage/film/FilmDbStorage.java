@@ -74,7 +74,7 @@ public class FilmDbStorage implements FilmStorage {
         int status = jdbcTemplate.update("update films set name = ?, description = ?, duration = ?, releaseDate = ?, mpa_id = ? where id = ?",
                 film.getName(), film.getDescription(), film.getDuration(), film.getReleaseDate(), mpaId, film.getId());
 
-        if(status == 0){
+        if (status == 0) {
             throw new NotFoundException("Фильм с id " + film.getId() + " не найден");
         }
         return film;
@@ -87,7 +87,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film findById(long filmId) {
-        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM films WHERE id = ?", new Object[] { filmId } , Integer.class);
+        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM films WHERE id = ?", new Object[] { filmId }, Integer.class);
         if (count > 0) {
         Film film = Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM films where id = ?", new FilmRowMapper(), filmId))
                 .orElseThrow(() ->
@@ -118,7 +118,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void getLikes(Film film) {
-        int likesCount = jdbcTemplate.queryForObject("SELECT count(*) FROM likes WHERE film_id = ?", new Object[] { film.getId() } , Integer.class);
+        int likesCount = jdbcTemplate.queryForObject("SELECT count(*) FROM likes WHERE film_id = ?", new Object[] { film.getId() }, Integer.class);
         if (likesCount > 0) {
             for (Long userId:jdbcTemplate.queryForList("SELECT user_id FROM likes where film_id = ?", Long.class, film.getId())) {
                 film.addLike(userId);
@@ -127,7 +127,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void getGenres(Film film) {
-        int genresCount = jdbcTemplate.queryForObject("SELECT count(*) FROM film_genres WHERE film_id = ?", new Object[] { film.getId() } , Integer.class);
+        int genresCount = jdbcTemplate.queryForObject("SELECT count(*) FROM film_genres WHERE film_id = ?", new Object[] { film.getId() }, Integer.class);
         if (genresCount > 0) {
             jdbcTemplate.query("SELECT genre_id FROM film_genres where film_id = ?", new FilmGenresRowMapper(), film.getId()).forEach(genre -> {
                 film.addGenre(genreStorage.findById(genre.getId()));

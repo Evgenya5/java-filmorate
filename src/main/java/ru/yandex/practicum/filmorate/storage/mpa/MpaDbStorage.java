@@ -29,7 +29,7 @@ public class MpaDbStorage implements MpaStorage {
         if (id == 0) {
            return new Mpa();
         }
-        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM mpa WHERE id = ?", new Object[] { id } , Integer.class);
+        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM mpa WHERE id = ?", new Object[] { id }, Integer.class);
         if (count > 0) {
             return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT id, name FROM mpa where id = ?", new MpaRowMapper(), id))
                 .orElseThrow(() ->

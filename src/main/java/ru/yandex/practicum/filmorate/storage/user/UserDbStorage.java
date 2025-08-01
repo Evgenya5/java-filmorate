@@ -23,7 +23,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findById(long id) {
-        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM users WHERE id = ?", new Object[] { id } , Integer.class);
+        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM users WHERE id = ?", new Object[] { id }, Integer.class);
         if (count > 0) {
             User user = Optional.ofNullable(jdbcTemplate.queryForObject("SELECT id, email, login, name, birthday FROM users where id = ?", new UserRowMapper(), id))
                     .orElseThrow(() ->
@@ -58,7 +58,7 @@ public class UserDbStorage implements UserStorage {
         int status = jdbcTemplate.update("update users set name = ?, login = ?, email = ?, birthday = ? where id = ?",
                 user.getName(), user.getLogin(), user.getEmail(), user.getBirthday(), user.getId());
 
-        if(status == 0){
+        if (status == 0) {
             throw new NotFoundException("Пользователь с id " + user.getId() + " не найден");
         }
         return user;
@@ -77,7 +77,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     private void getFriends(User user) {
-        int friendCount = jdbcTemplate.queryForObject("SELECT count(*) FROM friends WHERE user_id = ?", new Object[] { user.getId() } , Integer.class);
+        int friendCount = jdbcTemplate.queryForObject("SELECT count(*) FROM friends WHERE user_id = ?", new Object[] { user.getId() }, Integer.class);
         if (friendCount > 0) {
             for (Long friendId:jdbcTemplate.queryForList("SELECT friend_id FROM friends where user_id = ?", Long.class, user.getId())) {
                 user.addFriend(friendId);

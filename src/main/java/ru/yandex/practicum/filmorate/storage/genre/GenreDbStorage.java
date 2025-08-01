@@ -26,7 +26,7 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Genre findById(int id) {
-        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM genre WHERE id = ?", new Object[] { id } , Integer.class);
+        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM genre WHERE id = ?", new Object[] { id }, Integer.class);
         if (count > 0) {
             return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT id, name FROM genre where id = ?", new GenreRowMapper(), id))
                 .orElseThrow(() ->
