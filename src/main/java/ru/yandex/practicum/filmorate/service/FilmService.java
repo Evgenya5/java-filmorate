@@ -80,7 +80,7 @@ public class FilmService {
 
     public Film update(Film film) {
 
-        if (film == null || film.getId() <= 0 ) {
+        if (film == null || film.getId() <= 0) {
             log.error("update error: id is null");
             throw new ValidationException("Id должен быть указан");
         }
