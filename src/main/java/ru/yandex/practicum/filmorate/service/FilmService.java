@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -93,6 +94,11 @@ public class FilmService {
             } else {
                 oldFilm.setName(film.getName());
             }
+        }
+        int mpaId = 0;
+        if (Optional.ofNullable(film.getMpa()).isPresent()) {
+            mpaId = film.getMpa().getId();
+            oldFilm.setMpa(mpaStorage.findById(mpaId));
         }
         if (film.getDescription() != null) {
             if (film.getDescription().length() > 200) {

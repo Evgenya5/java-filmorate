@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS films (
-              id INTEGER,
+              id INTEGER NOT NULL,
               description varchar(210),
               name varchar(100) NOT NULL,
               duration integer,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS films (
               CONSTRAINT films_pk PRIMARY KEY (id)
           );
 CREATE TABLE IF NOT EXISTS users (
-              id INTEGER,
+              id INTEGER NOT NULL,
               email varchar(100) NOT NULL,
               name varchar(200),
               login varchar(200) NOT NULL,

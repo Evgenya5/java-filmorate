@@ -2,14 +2,14 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.rowMapper.UserRowMapper;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 
 @Component
 @Qualifier("userDbStorage")
@@ -23,23 +23,34 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findById(long id) {
-        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM users WHERE id = ?", new Object[] { id }, Integer.class);
-        if (count > 0) {
-            User user = Optional.ofNullable(jdbcTemplate.queryForObject("SELECT id, email, login, name, birthday FROM users where id = ?", new UserRowMapper(), id))
-                    .orElseThrow(() ->
-                            new NotFoundException("Пользователь с id = " + id + " не найден"));
-            getFriends(user);
+        try {
+            List<User> userList = jdbcTemplate.query("SELECT u.*, f.friend_id as friend_id FROM users u left join friends f on f.user_id = u.id where u.id = ?", new UserRowMapper(), id);
+            if (userList.isEmpty()) {
+                throw new NotFoundException("Пользователь с id = " + id + " не найден");
+            }
+            User user = userList.getFirst();
+            userList.removeFirst();
+            userList.forEach(user1 -> {
+                user.addFriend(user1.getFriends().stream().findFirst().get());
+            });
             return user;
-        } else {
+        } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
     }
 
     @Override
     public Collection<User> findAll() {
-        List<User> users = jdbcTemplate.query("SELECT id, email, login, name, birthday FROM users", new UserRowMapper());
-        users.forEach(this::getFriends);
-        return users;
+        Map<Long, User> users = new HashMap<>();
+        List<User> userList = jdbcTemplate.query("SELECT u.*, f.friend_id as friend_id FROM users u left join friends f on f.user_id = u.id", new UserRowMapper());
+        userList.forEach(user -> {
+            if (users.containsKey(user.getId())) {
+                users.get(user.getId()).addFriend(user.getFriends().stream().findFirst().get());
+            } else {
+                users.put(user.getId(), user);
+            }
+        });
+        return users.values();
     }
 
     @Override
@@ -74,14 +85,5 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void deleteFriend(User user, User friendUser) {
         jdbcTemplate.update("delete from friends where user_id = ? and friend_id = ?", user.getId(), friendUser.getId());
-    }
-
-    private void getFriends(User user) {
-        int friendCount = jdbcTemplate.queryForObject("SELECT count(*) FROM friends WHERE user_id = ?", new Object[] { user.getId() }, Integer.class);
-        if (friendCount > 0) {
-            for (Long friendId:jdbcTemplate.queryForList("SELECT friend_id FROM friends where user_id = ?", Long.class, user.getId())) {
-                user.addFriend(friendId);
-            }
-        }
     }
 }

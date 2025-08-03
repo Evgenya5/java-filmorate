@@ -127,6 +127,7 @@ public class UserService {
                 .mapToLong(User::getId)
                 .max()
                 .orElse(0);
+        log.info("currentMaxId = " + currentMaxId );
         return ++currentMaxId;
     }
 

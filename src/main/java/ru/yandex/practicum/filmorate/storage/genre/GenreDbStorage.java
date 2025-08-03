@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.rowMapper.GenreRowMapper;
-import java.util.Collection;
-import java.util.Optional;
+
+import java.util.*;
 
 @Component
 @Qualifier("genreDbStorage")
 public class GenreDbStorage implements GenreStorage {
+    private final Map<Integer, Genre> genres = new HashMap<>();
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -22,18 +23,21 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Collection<Genre> findAll() {
-        return jdbcTemplate.query("SELECT id, name FROM genre", new GenreRowMapper());
+        jdbcTemplate.query("SELECT id, name FROM genre", new GenreRowMapper())
+                .forEach(genre -> {
+                    genres.put(genre.getId(),genre);
+                });
+        return genres.values();
     }
 
     @Override
     public Genre findById(int id) {
-        int count = jdbcTemplate.queryForObject("SELECT count(*) FROM genre WHERE id = ?", new Object[] { id }, Integer.class);
-        if (count > 0) {
-            return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT id, name FROM genre where id = ?", new GenreRowMapper(), id))
-                .orElseThrow(() ->
-                new NotFoundException("Жанр с id = " + id + " не найден"));
-        } else {
-            throw new NotFoundException("Жанр с id = " + id + " не найден");
+        if (genres.isEmpty()) {
+            findAll();
         }
+        genres.get(id);
+        return Optional.ofNullable(genres.get(id))
+                .orElseThrow(() ->
+                        new NotFoundException("Жанр с id = " + id + " не найден"));
     }
 }
