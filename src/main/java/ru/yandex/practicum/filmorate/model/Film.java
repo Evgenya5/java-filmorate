@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -10,9 +9,7 @@ import java.util.Set;
  * Film.
  */
 @Data
-@Table(name = "films")
 public class Film {
-    @Id
     private long id;
     private String description;
     private String name;
