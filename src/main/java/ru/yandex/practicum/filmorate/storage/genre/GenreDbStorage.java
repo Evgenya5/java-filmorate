@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.genre;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -13,7 +14,6 @@ import java.util.*;
 @Component
 @Qualifier("genreDbStorage")
 public class GenreDbStorage implements GenreStorage {
-    private final Map<Integer, Genre> genres = new HashMap<>();
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -23,21 +23,17 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Collection<Genre> findAll() {
-        jdbcTemplate.query("SELECT id, name FROM genre", new GenreRowMapper())
-                .forEach(genre -> {
-                    genres.put(genre.getId(),genre);
-                });
-        return genres.values();
+        return jdbcTemplate.query("SELECT id, name FROM genre", new GenreRowMapper());
     }
 
     @Override
     public Genre findById(int id) {
-        if (genres.isEmpty()) {
-            findAll();
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT id, name FROM genre where id = ?", new GenreRowMapper(), id))
+                    .orElseThrow(() ->
+                            new NotFoundException("Жанр с id = " + id + " не найден"));
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Жанр с id = " + id + " не найден");
         }
-        genres.get(id);
-        return Optional.ofNullable(genres.get(id))
-                .orElseThrow(() ->
-                        new NotFoundException("Жанр с id = " + id + " не найден"));
     }
 }

@@ -24,16 +24,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User findById(long id) {
         try {
-            List<User> userList = jdbcTemplate.query("SELECT u.*, f.friend_id as friend_id FROM users u left join friends f on f.user_id = u.id where u.id = ?", new UserRowMapper(), id);
-            if (userList.isEmpty()) {
-                throw new NotFoundException("Пользователь с id = " + id + " не найден");
-            }
-            User user = userList.getFirst();
-            userList.removeFirst();
-            userList.forEach(user1 -> {
-                user.addFriend(user1.getFriends().stream().findFirst().get());
-            });
-            return user;
+            return jdbcTemplate.queryForObject("SELECT * FROM users where id = ?", new UserRowMapper(), id);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
@@ -41,16 +32,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> findAll() {
-        Map<Long, User> users = new HashMap<>();
-        List<User> userList = jdbcTemplate.query("SELECT u.*, f.friend_id as friend_id FROM users u left join friends f on f.user_id = u.id", new UserRowMapper());
-        userList.forEach(user -> {
-            if (users.containsKey(user.getId())) {
-                users.get(user.getId()).addFriend(user.getFriends().stream().findFirst().get());
-            } else {
-                users.put(user.getId(), user);
-            }
-        });
-        return users.values();
+        return jdbcTemplate.query("SELECT * FROM users", new UserRowMapper());
     }
 
     @Override
@@ -85,5 +67,23 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void deleteFriend(User user, User friendUser) {
         jdbcTemplate.update("delete from friends where user_id = ? and friend_id = ?", user.getId(), friendUser.getId());
+    }
+
+    @Override
+    public Collection<User> getCommonFriends(User user, User otherUser) {
+        try {
+            return jdbcTemplate.query("SELECT u.* FROM friends f join users u ON f.friend_id = u.id where f.user_id in (?, ?) group by u.id having count(u.id) = 2", new UserRowMapper(), user.getId(), otherUser.getId());
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Друзья для пользователей с id = " + user.getId() + ", " + otherUser.getId());
+        }
+    }
+
+    @Override
+    public Collection<User> getFriends(User user) {
+        try {
+            return jdbcTemplate.query("SELECT u.* FROM friends f join users u ON f.friend_id = u.id where f.user_id = ?", new UserRowMapper(), user.getId());
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Друзья для пользователя с id = " + user.getId());
+        }
     }
 }

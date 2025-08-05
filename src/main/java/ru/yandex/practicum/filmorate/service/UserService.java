@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Slf4j
@@ -100,25 +99,14 @@ public class UserService {
     }
 
     public Collection<User> getFriends(long id) {
-        Collection<User> friends = new ArrayList<>();
         User user = userStorage.findById(id);
-        for (long friendId:user.getFriends()) {
-            friends.add(userStorage.findById(friendId));
-        }
-        return friends;
+        return userStorage.getFriends(user);
     }
 
     public Collection<User> getCommonFriends(long id, long otherId) {
-        Collection<User> friends = new ArrayList<>();
         User user = userStorage.findById(id);
         User otherUser = userStorage.findById(otherId);
-
-        for (long friendId:user.getFriends()) {
-            if (otherUser.getFriends().contains(friendId)) {
-                friends.add(userStorage.findById(friendId));
-            }
-        }
-        return friends;
+        return userStorage.getCommonFriends(user, otherUser);
     }
 
     private long getNextId() {

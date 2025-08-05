@@ -4,12 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.rowMapper.FilmRowMapper;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
@@ -34,11 +37,20 @@ public class FilmDbStorage implements FilmStorage {
         filmList.forEach(film1 -> {
             if (films.containsKey(film1.getId())) {
                 Film film = films.get(film1.getId());
-                if (!film1.getLikes().isEmpty() && !film.getLikes().contains(film1.getLikes().stream().findFirst().get())) {
+                if (!film1.getLikes().isEmpty()) {
+                    film1.getLikes().forEach(like -> {
+                        if (!film.getLikes().contains(like)) {
+                            film.addLike(like);
+                        }
+                    });
                     film.addLike(film1.getLikes().stream().findFirst().get());
                 }
-                if (!film1.getGenres().isEmpty() && !film.getGenres().contains(film1.getGenres().stream().findFirst().get())) {
-                    film.addGenre(film1.getGenres().stream().findFirst().get());
+                if (!film1.getGenres().isEmpty()) {
+                    film1.getGenres().forEach(genre -> {
+                        if (!film.getGenres().contains(genre)) {
+                            film.addGenre(genre);
+                        }
+                    });
                 }
                 films.put(film.getId(), film);
             } else {
@@ -95,11 +107,20 @@ public class FilmDbStorage implements FilmStorage {
             Film film = filmList.getFirst();
             filmList.removeFirst();
             filmList.forEach(film1 -> {
-                if (!film1.getLikes().isEmpty() && !film.getLikes().contains(film1.getLikes().stream().findFirst().get())) {
+                if (!film1.getLikes().isEmpty()) {
+                    film1.getLikes().forEach(like -> {
+                        if (!film.getLikes().contains(like)) {
+                            film.addLike(like);
+                        }
+                    });
                     film.addLike(film1.getLikes().stream().findFirst().get());
                 }
-                if (!film1.getGenres().isEmpty() && !film.getGenres().contains(film1.getGenres().stream().findFirst().get())) {
-                    film.addGenre(film1.getGenres().stream().findFirst().get());
+                if (!film1.getGenres().isEmpty()) {
+                    film1.getGenres().forEach(genre -> {
+                        if (!film.getGenres().contains(genre)) {
+                            film.addGenre(genre);
+                        }
+                    });
                 }
             });
             return film;
@@ -121,10 +142,17 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void addFilmGenres(Film film) {
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update(
-                    "INSERT INTO film_genres VALUES (?, ?)",
-                    film.getId(), genre.getId());
-        }
+        jdbcTemplate.batchUpdate("INSERT INTO film_genres VALUES (?, ?)", new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, film.getId());
+                ps.setInt(2, film.getGenres().stream().toList().get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return film.getGenres().size();
+            }
+        });
     }
 }
