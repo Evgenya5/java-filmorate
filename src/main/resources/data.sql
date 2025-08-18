@@ -1,0 +1,88 @@
+INSERT INTO genre (id, name)
+SELECT 1, 'Комедия'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM genre
+   WHERE id = 1
+);
+INSERT INTO genre (id, name)
+SELECT 2, 'Драма'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM genre
+   WHERE id = 2
+);
+INSERT INTO genre (id, name)
+SELECT 3, 'Мультфильм'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM genre
+   WHERE id = 3
+);
+INSERT INTO genre (id, name)
+SELECT 4, 'Триллер'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM genre
+   WHERE id = 4
+);
+INSERT INTO genre (id, name)
+SELECT 5, 'Документальный'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM genre
+   WHERE id = 5
+);
+INSERT INTO genre (id, name)
+SELECT 6, 'Боевик'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM genre
+   WHERE id = 6
+);
+INSERT INTO mpa (id, name)
+SELECT 1, 'G'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM mpa
+   WHERE id = 1
+);
+INSERT INTO mpa (id, name)
+SELECT 2, 'PG'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM mpa
+   WHERE id = 2
+);
+INSERT INTO mpa (id, name)
+SELECT 3, 'PG-13'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM mpa
+   WHERE id = 3
+);
+INSERT INTO mpa (id, name)
+SELECT 4, 'R'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM mpa
+   WHERE id = 4
+);
+INSERT INTO mpa (id, name)
+SELECT 5, 'NC-17'
+FROM DUAL
+WHERE NOT EXISTS (
+   SELECT 1
+   FROM mpa
+   WHERE id = 5
+);

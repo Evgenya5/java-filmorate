@@ -45,7 +45,6 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody Film film) {
-        log.debug(film.getDescription());
         return filmService.create(film);
     }
 
